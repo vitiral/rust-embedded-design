@@ -23,6 +23,7 @@ These design documents will be split into three sections:
 Next:
 - [[REQ-layers]]: the dependency layer structure this ecosystem aims to achieve
 
+> The repository for these documents is at https://github.com/vitiral/rust-embedded-design
 '''
 
 [REQ-layers]
