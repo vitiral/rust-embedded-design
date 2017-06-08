@@ -1,0 +1,156 @@
+[REQ-purpose]
+text = '''
+The purpose of these documents is to lay out the design for a rust embedded
+ecosystem from the top down. The end goal is to create a turly revolutionary
+embedded development experience by utilizing a safe language (rust) combined
+with zero-cost libraries with well design APIs which all *work together*.
+
+The intent is not to tell other developers how they should design their
+embedded APIs, but rather to help diagnose the areas in rust's embedded
+development story that needs further work.
+
+These design documents will be split into three sections: 
+- (REQ) requirements: this is the libraries we *want* at a high level.
+  This lays out the various layers ([[REQ-layers]]) of abstraction that the
+  ecosystem should provide to make programming on microcontrollers safe,
+  productive and enjoyable.
+- (SPC) specifications: these will link to a REQ and will lay out a rough
+  high level API/s for how to accomplish the requirement, as well as
+  provide links to existing libraries and discuss their pros and cons.
+- (TST) tests: will discuss tools and methodologies for testing the various
+  suggested implementations of the ecosystem
+
+Next:
+- [[REQ-layers]]: the dependency layer structure this ecosystem aims to achieve
+
+'''
+
+[REQ-layers]
+text = '''
+Many people think of microcontrollers as only "low level" programming. This
+is not accurate, as a huge amount of abstraction is possible with APIs that
+are designed to be zero cost. Rust makes it easy to design such APIs while
+still maintaining memory and data race safety.
+
+The rust-embedded design shall follow the following layers, from high level
+to low level:
+
+```
+Layer 1:
++------------------------------------------------------------------------------+
+|                     Application                                              |
++------------------------------------------------------------------------------+
+Layer 2:   ^                ^        ^              ^               ^
++-------------------+ +-----------+  ^  +------------------------+ +--------------+ 
+| Communication     | | Board API |  ^  | Data Types / Functions | | Concurrency  | 
++-------------------+ +-----------+  ^  +------------------------+ +--------------+ 
+Layer 3:   ^                ^        ^              ^               ^      ^
++-------------------+  +-------------^-+        +----------------------+   ^  
+| Generic Protocols |<-| External      |        | Memory Management    |   ^  
++-------------------+  +---------------+        +----------------------+   ^  
+Layer 4:    ^               ^                                              ^
++------------------------------------------------------------------------------+
+|                     Hardware Abstraction Layer (HAL)                         |
++------------------------------------------------------------------------------+
+```
+
+Let's break these down:
+Layer 1:
+- [[REQ-app]]: The **Application Layer** (AL) is where the user creates their programs
+
+Layer 2:
+- [[REQ-com]]: The **Communication Layer** is a high level APIs for
+  communicating with other programmable devices/computers through protocols
+  like MQTT or HTTP/JSON-RPC.
+- [[REQ-board]]: The **Board API Layer** provides an API for the specific board
+  features including GPIO, peripherals, sensors, etc.
+- [[REQ-std]]: The **Data Types / Functions Layer** provides ready data types
+  and functions for a range of issues including buffering, serializing,
+  computation, data validation, etc. It's like the standard library of
+  microcontroller development.
+- [[REQ-concurrency]]: The **Concurrency Layer** provides an API for performing
+  actions concurrently. It depends on the Memory Management Layer for sharing
+  data between threads.
+
+Layer 3:
+- [[REQ-protocols]]: The **Generic Protocols Layer** provides a socket-like API
+  to the various hardware protocols (ethernet, I2C, SPI, CAN, etc). Also may
+  depend on the External Layer
+- [[REQ-external]]: The **External Layer** provides device-specific APIs for
+  external peripherals including temperature sensors, memory/storage,
+  communication, etc.
+- [[REQ-mem]]: The **Memory Management Layer** provides data structures and libraries for
+  managing memory including sharing between threads, global buffers, and memory
+  allocation.
+
+Layer 4:
+- [[REQ-hal]]: the hardware abstraction layer provides data structues for safely interfacing
+  directly with any device's registers. 
+'''
+
+[REQ-app]
+text = '''
+The application layer is where a user creates their programs. Creating programs
+can be productive only because of all the other layers in the ecosystem, so the
+design experience of this layer must be well specified.
+
+The most basic requirement of this layer is that it should feel, as much as possible,
+like programming for non-embedded rust. The only differences being:
+- slightly different library
+- tighter constraints (around memory, cpu-usage, etc).
+
+That's it! Ideally the layers below this will offer data types and libraries
+that will give a developer of embedded devices much the same workflow as a
+developer of non-embedded devices.
+'''
+
+[REQ-com]
+text = '''
+The communications layer has the goal of making it easy to coordinate multiple
+devices with any number of computers. These include making it easy to:
+- publish/stream data to those who want it
+- receive commands (micro RPC)
+- log errors
+
+In addition, the communications layer should work over a range of masterless
+protocols including TCP/IP, ZigBee, UART, and CAN.
+
+Communication is critical to embedded systems, as many such systems employ tens
+or even hundreds of devies all performing monitoring and control functions
+simultaniously. Such systems need to be fault tolerant and highly reliable.
+'''
+
+[REQ-board]
+text = '''
+Perhaps one of the most well developed embedded APIs to date as been the
+API around the Arduino development board. This requirement aims to emulate
+and improve upon the kind of API which Arduino spearheaded.
+
+The Board Layer should provide a simple and safe API to all board peripherals,
+preventing the user from making horrendous mistakes (i.e. sourcing an I2C
+line) and giving them mappings to access the board's external device's
+libraries. 
+'''
+
+[REQ-std]
+text = '''
+Provide a standard-library like experience for the embedded space. This means
+providing ready data types and functions for:
+- buffering: creating global buffers and sharing them with functions and
+  between threads.
+- serialzing: serializing data with low overhead marshalling and validation of
+  types. 
+- computation: lightweight mathematics libraries
+- data validation: lightweight hash, encryption and crc algorithms
+'''
+
+[REQ-concurrency]
+text = '''
+Provide concurrency primitives and APIs for the embedded space, including
+utilizing interrupts.
+
+The concurrency API should be leveragable by other libraries (like
+communication) with minimal boiler plate.
+
+TODO: draw ideas from here http://blog.japaric.io/fearless-concurrency/
+'''
