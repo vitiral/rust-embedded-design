@@ -11303,34 +11303,13 @@ var _user$project$Artifacts_View$completion = function (artifact) {
 			}
 		});
 };
-var _user$project$Artifacts_Edit$removeSlashEnd = function (path) {
-	removeSlashEnd:
-	while (true) {
-		if (A2(_elm_lang$core$String$endsWith, '/', path)) {
-			var _v0 = A2(_elm_lang$core$String$dropRight, 1, path);
-			path = _v0;
-			continue removeSlashEnd;
-		} else {
-			return path;
-		}
-	}
-};
 var _user$project$Artifacts_Edit$fullArtifactUrl = F2(
 	function (model, indexName) {
-		var origin = function () {
-			var _p0 = _elm_lang$core$List$head(
-				A2(_elm_lang$core$String$split, '#', model.location.href));
-			if (_p0.ctor === 'Just') {
-				return _user$project$Artifacts_Edit$removeSlashEnd(_p0._0);
-			} else {
-				return 'ERROR-origin-no-head';
-			}
-		}();
 		var addrName = _elm_lang$core$String$toLower(
 			_user$project$Artifacts_Models$indexNameUnchecked(indexName));
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
-			origin,
+			model.location.origin,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
 				'/',
@@ -11415,9 +11394,9 @@ var _user$project$Artifacts_Edit$displayRawText = F2(
 	});
 var _user$project$Artifacts_Edit$selectRenderedBtns = function (model) {
 	var edit = model.state.edit;
-	var _p1 = edit.rendered ? {ctor: '_Tuple2', _0: 'black', _1: 'gray'} : {ctor: '_Tuple2', _0: 'gray', _1: 'black'};
-	var rendered_clr = _p1._0;
-	var raw_clr = _p1._1;
+	var _p0 = edit.rendered ? {ctor: '_Tuple2', _0: 'black', _1: 'gray'} : {ctor: '_Tuple2', _0: 'gray', _1: 'black'};
+	var rendered_clr = _p0._0;
+	var raw_clr = _p0._1;
 	return A2(
 		_elm_lang$html$Html$span,
 		{ctor: '[]'},
@@ -11578,23 +11557,23 @@ var _user$project$Artifacts_Edit$artifactLinkRegex = _elm_lang$core$Regex$caseIn
 var _user$project$Artifacts_Edit$replaceArtifactLinks = F2(
 	function (model, text) {
 		var replace = function (match) {
-			var _p2 = _elm_lang$core$List$head(match.submatches);
-			if (_p2.ctor === 'Just') {
-				var _p3 = _p2._0;
-				if (_p3.ctor === 'Just') {
-					var _p4 = _p3._0;
+			var _p1 = _elm_lang$core$List$head(match.submatches);
+			if (_p1.ctor === 'Just') {
+				var _p2 = _p1._0;
+				if (_p2.ctor === 'Just') {
+					var _p3 = _p2._0;
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						'[',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							_p4,
+							_p3,
 							A2(
 								_elm_lang$core$Basics_ops['++'],
 								'](',
 								A2(
 									_elm_lang$core$Basics_ops['++'],
-									A2(_user$project$Artifacts_Edit$fullArtifactUrl, model, _p4),
+									A2(_user$project$Artifacts_Edit$fullArtifactUrl, model, _p3),
 									')'))));
 				} else {
 					return 'INTERNAL_ERROR';
@@ -12718,7 +12697,7 @@ var _user$project$Main$subscriptions = function (model) {
 var _user$project$Main$initialModel = F3(
 	function (location, addr, route) {
 		return {
-			artifacts: _user$project$Artifacts_Commands$artifactsFromStrUnsafe('[{"code":null,"completed":0.0,"done":null,"id":0,"name":"REQ","partof":[],"parts":["REQ-app","REQ-board","REQ-com","REQ-concurrency","REQ-layers","REQ-purpose","REQ-std"],"path":"PARENT","tested":0.0,"text":"AUTO"},{"code":null,"completed":0.0,"done":null,"id":1,"name":"REQ-std","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Provide a standard-library like experience for the embedded space. This means\\nproviding ready data types and functions for:\\n- buffering: creating global buffers and sharing them with functions and\\n  between threads.\\n- serialzing: serializing data with low overhead marshalling and validation of\\n  types. \\n- computation: lightweight mathematics libraries\\n- data validation: lightweight hash, encryption and crc algorithms\\n"},{"code":null,"completed":0.0,"done":null,"id":2,"name":"REQ-layers","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Many people think of microcontrollers as only \\"low level\\" programming. This\\nis not accurate, as a huge amount of abstraction is possible with APIs that\\nare designed to be zero cost. Rust makes it easy to design such APIs while\\nstill maintaining memory and data race safety.\\n\\nThe rust-embedded design shall follow the following layers, from high level\\nto low level:\\n\\n```\\nLayer 1:\\n+------------------------------------------------------------------------------+\\n|                     Application                                              |\\n+------------------------------------------------------------------------------+\\nLayer 2:   ^                ^        ^              ^               ^\\n+-------------------+ +-----------+  ^  +------------------------+ +--------------+ \\n| Communication     | | Board API |  ^  | Data Types / Functions | | Concurrency  | \\n+-------------------+ +-----------+  ^  +------------------------+ +--------------+ \\nLayer 3:   ^                ^        ^              ^               ^      ^\\n+-------------------+  +-------------^-+        +----------------------+   ^  \\n| Generic Protocols |<-| External      |        | Memory Management    |   ^  \\n+-------------------+  +---------------+        +----------------------+   ^  \\nLayer 4:    ^               ^                                              ^\\n+------------------------------------------------------------------------------+\\n|                     Hardware Abstraction Layer (HAL)                         |\\n+------------------------------------------------------------------------------+\\n```\\n\\nLet\'s break these down:\\nLayer 1:\\n- [[REQ-app]]: The **Application Layer** (AL) is where the user creates their programs\\n\\nLayer 2:\\n- [[REQ-com]]: The **Communication Layer** is a high level APIs for\\n  communicating with other programmable devices/computers through protocols\\n  like MQTT or HTTP/JSON-RPC.\\n- [[REQ-board]]: The **Board API Layer** provides an API for the specific board\\n  features including GPIO, peripherals, sensors, etc.\\n- [[REQ-std]]: The **Data Types / Functions Layer** provides ready data types\\n  and functions for a range of issues including buffering, serializing,\\n  computation, data validation, etc. It\'s like the standard library of\\n  microcontroller development.\\n- [[REQ-concurrency]]: The **Concurrency Layer** provides an API for performing\\n  actions concurrently. It depends on the Memory Management Layer for sharing\\n  data between threads.\\n\\nLayer 3:\\n- [[REQ-protocols]]: The **Generic Protocols Layer** provides a socket-like API\\n  to the various hardware protocols (ethernet, I2C, SPI, CAN, etc). Also may\\n  depend on the External Layer\\n- [[REQ-external]]: The **External Layer** provides device-specific APIs for\\n  external peripherals including temperature sensors, memory/storage,\\n  communication, etc.\\n- [[REQ-mem]]: The **Memory Management Layer** provides data structures and libraries for\\n  managing memory including sharing between threads, global buffers, and memory\\n  allocation.\\n\\nLayer 4:\\n- [[REQ-hal]]: the hardware abstraction layer provides data structues for safely interfacing\\n  directly with any device\'s registers. \\n"},{"code":null,"completed":0.0,"done":null,"id":3,"name":"REQ-board","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Perhaps one of the most well developed embedded APIs to date as been the\\nAPI around the Arduino development board. This requirement aims to emulate\\nand improve upon the kind of API which Arduino spearheaded.\\n\\nThe Board Layer should provide a simple and safe API to all board peripherals,\\npreventing the user from making horrendous mistakes (i.e. sourcing an I2C\\nline) and giving them mappings to access the board\'s external device\'s\\nlibraries. \\n"},{"code":null,"completed":0.0,"done":null,"id":4,"name":"REQ-com","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The communications layer has the goal of making it easy to coordinate multiple\\ndevices with any number of computers. These include making it easy to:\\n- publish/stream data to those who want it\\n- receive commands (micro RPC)\\n- log errors\\n\\nIn addition, the communications layer should work over a range of masterless\\nprotocols including TCP/IP, ZigBee, UART, and CAN.\\n\\nCommunication is critical to embedded systems, as many such systems employ tens\\nor even hundreds of devies all performing monitoring and control functions\\nsimultaniously. Such systems need to be fault tolerant and highly reliable.\\n"},{"code":null,"completed":0.0,"done":null,"id":5,"name":"REQ-purpose","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The purpose of these documents is to lay out the design for a rust embedded\\necosystem from the top down. The end goal is to create a turly revolutionary\\nembedded development experience by utilizing a safe language (rust) combined\\nwith zero-cost libraries with well design APIs which all *work together*.\\n\\nThe intent is not to tell other developers how they should design their\\nembedded APIs, but rather to help diagnose the areas in rust\'s embedded\\ndevelopment story that needs further work.\\n\\nThese design documents will be split into three sections: \\n- (REQ) requirements: this is the libraries we *want* at a high level.\\n  This lays out the various layers of abstraction that the\\n  ecosystem should provide to make programming on microcontrollers safe,\\n  productive and enjoyable.\\n- (SPC) specifications: these will link to a REQ and will lay out a rough\\n  high level API/s for how to accomplish the requirement, as well as\\n  provide links to existing libraries and discuss their pros and cons.\\n- (TST) tests: will discuss tools and methodologies for testing the various\\n  suggested implementations of the ecosystem\\n\\nNext:\\n- [[REQ-layers]]: the dependency layer structure this ecosystem aims to achieve\\n\\n"},{"code":null,"completed":0.0,"done":null,"id":6,"name":"REQ-concurrency","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Provide concurrency primitives and APIs for the embedded space, including\\nutilizing interrupts.\\n\\nThe concurrency API should be leveragable by other libraries (like\\ncommunication) with minimal boiler plate.\\n\\nTODO: draw ideas from here http://blog.japaric.io/fearless-concurrency/\\n"},{"code":null,"completed":0.0,"done":null,"id":7,"name":"REQ-app","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The application layer is where a user creates their programs. Creating programs\\ncan be productive only because of all the other layers in the ecosystem, so the\\ndesign experience of this layer must be well specified.\\n\\nThe most basic requirement of this layer is that it should feel, as much as possible,\\nlike programming for non-embedded rust. The only differences being:\\n- slightly different library\\n- tighter constraints (around memory, cpu-usage, etc).\\n\\nThat\'s it! Ideally the layers below this will offer data types and libraries\\nthat will give a developer of embedded devices much the same workflow as a\\ndeveloper of non-embedded devices.\\n"}]'),
+			artifacts: _user$project$Artifacts_Commands$artifactsFromStrUnsafe('[{"code":null,"completed":0.0,"done":null,"id":0,"name":"REQ-app","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The application layer is where a user creates their programs. Creating programs\\ncan be productive only because of all the other layers in the ecosystem, so the\\ndesign experience of this layer must be well specified.\\n\\nThe most basic requirement of this layer is that it should feel, as much as possible,\\nlike programming for non-embedded rust. The only differences being:\\n- slightly different library\\n- tighter constraints (around memory, cpu-usage, etc).\\n\\nThat\'s it! Ideally the layers below this will offer data types and libraries\\nthat will give a developer of embedded devices much the same workflow as a\\ndeveloper of non-embedded devices.\\n"},{"code":null,"completed":0.0,"done":null,"id":1,"name":"REQ-com","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The communications layer has the goal of making it easy to coordinate multiple\\ndevices with any number of computers. These include making it easy to:\\n- publish/stream data to those who want it\\n- receive commands (micro RPC)\\n- log errors\\n\\nIn addition, the communications layer should work over a range of masterless\\nprotocols including TCP/IP, ZigBee, UART, and CAN.\\n\\nCommunication is critical to embedded systems, as many such systems employ tens\\nor even hundreds of devies all performing monitoring and control functions\\nsimultaniously. Such systems need to be fault tolerant and highly reliable.\\n"},{"code":null,"completed":0.0,"done":null,"id":2,"name":"REQ-concurrency","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Provide concurrency primitives and APIs for the embedded space, including\\nutilizing interrupts.\\n\\nThe concurrency API should be leveragable by other libraries (like\\ncommunication) with minimal boiler plate.\\n\\nTODO: draw ideas from here http://blog.japaric.io/fearless-concurrency/\\n"},{"code":null,"completed":0.0,"done":null,"id":3,"name":"REQ-board","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Perhaps one of the most well developed embedded APIs to date as been the\\nAPI around the Arduino development board. This requirement aims to emulate\\nand improve upon the kind of API which Arduino spearheaded.\\n\\nThe Board Layer should provide a simple and safe API to all board peripherals,\\npreventing the user from making horrendous mistakes (i.e. sourcing an I2C\\nline) and giving them mappings to access the board\'s external device\'s\\nlibraries. \\n"},{"code":null,"completed":0.0,"done":null,"id":4,"name":"REQ-std","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Provide a standard-library like experience for the embedded space. This means\\nproviding ready data types and functions for:\\n- buffering: creating global buffers and sharing them with functions and\\n  between threads.\\n- serialzing: serializing data with low overhead marshalling and validation of\\n  types. \\n- computation: lightweight mathematics libraries\\n- data validation: lightweight hash, encryption and crc algorithms\\n"},{"code":null,"completed":0.0,"done":null,"id":5,"name":"REQ-purpose","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"The purpose of these documents is to lay out the design for a rust embedded\\necosystem from the top down. The end goal is to create a turly revolutionary\\nembedded development experience by utilizing a safe language (rust) combined\\nwith zero-cost libraries with well design APIs which all *work together*.\\n\\nThe intent is not to tell other developers how they should design their\\nembedded APIs, but rather to help diagnose the areas in rust\'s embedded\\ndevelopment story that needs further work.\\n\\nThese design documents will be split into three sections: \\n- (REQ) requirements: this is the libraries we *want* at a high level.\\n  This lays out the various layers of abstraction that the\\n  ecosystem should provide to make programming on microcontrollers safe,\\n  productive and enjoyable.\\n- (SPC) specifications: these will link to a REQ and will lay out a rough\\n  high level API/s for how to accomplish the requirement, as well as\\n  provide links to existing libraries and discuss their pros and cons.\\n- (TST) tests: will discuss tools and methodologies for testing the various\\n  suggested implementations of the ecosystem\\n\\nNext:\\n- [[REQ-layers]]: the dependency layer structure this ecosystem aims to achieve\\n\\n> The repository for these documents is at https://github.com/vitiral/rust-embedded-design\\n"},{"code":null,"completed":0.0,"done":null,"id":6,"name":"REQ","partof":[],"parts":["REQ-app","REQ-board","REQ-com","REQ-concurrency","REQ-layers","REQ-purpose","REQ-std"],"path":"PARENT","tested":0.0,"text":"AUTO"},{"code":null,"completed":0.0,"done":null,"id":7,"name":"REQ-layers","partof":["REQ"],"parts":[],"path":"design/purpose.toml","tested":0.0,"text":"Many people think of microcontrollers as only \\"low level\\" programming. This\\nis not accurate, as a huge amount of abstraction is possible with APIs that\\nare designed to be zero cost. Rust makes it easy to design such APIs while\\nstill maintaining memory and data race safety.\\n\\nThe rust-embedded design shall follow the following layers, from high level\\nto low level:\\n\\n```\\nLayer 1:\\n+------------------------------------------------------------------------------+\\n|                     Application                                              |\\n+------------------------------------------------------------------------------+\\nLayer 2:   ^                ^        ^              ^               ^\\n+-------------------+ +-----------+  ^  +------------------------+ +--------------+ \\n| Communication     | | Board API |  ^  | Data Types / Functions | | Concurrency  | \\n+-------------------+ +-----------+  ^  +------------------------+ +--------------+ \\nLayer 3:   ^                ^        ^              ^               ^      ^\\n+-------------------+  +-------------^-+        +----------------------+   ^  \\n| Generic Protocols |<-| External      |        | Memory Management    |   ^  \\n+-------------------+  +---------------+        +----------------------+   ^  \\nLayer 4:    ^               ^                                              ^\\n+------------------------------------------------------------------------------+\\n|                     Hardware Abstraction Layer (HAL)                         |\\n+------------------------------------------------------------------------------+\\n```\\n\\nLet\'s break these down:\\nLayer 1:\\n- [[REQ-app]]: The **Application Layer** (AL) is where the user creates their programs\\n\\nLayer 2:\\n- [[REQ-com]]: The **Communication Layer** is a high level APIs for\\n  communicating with other programmable devices/computers through protocols\\n  like MQTT or HTTP/JSON-RPC.\\n- [[REQ-board]]: The **Board API Layer** provides an API for the specific board\\n  features including GPIO, peripherals, sensors, etc.\\n- [[REQ-std]]: The **Data Types / Functions Layer** provides ready data types\\n  and functions for a range of issues including buffering, serializing,\\n  computation, data validation, etc. It\'s like the standard library of\\n  microcontroller development.\\n- [[REQ-concurrency]]: The **Concurrency Layer** provides an API for performing\\n  actions concurrently. It depends on the Memory Management Layer for sharing\\n  data between threads.\\n\\nLayer 3:\\n- [[REQ-protocols]]: The **Generic Protocols Layer** provides a socket-like API\\n  to the various hardware protocols (ethernet, I2C, SPI, CAN, etc). Also may\\n  depend on the External Layer\\n- [[REQ-external]]: The **External Layer** provides device-specific APIs for\\n  external peripherals including temperature sensors, memory/storage,\\n  communication, etc.\\n- [[REQ-mem]]: The **Memory Management Layer** provides data structures and libraries for\\n  managing memory including sharing between threads, global buffers, and memory\\n  allocation.\\n\\nLayer 4:\\n- [[REQ-hal]]: the hardware abstraction layer provides data structues for safely interfacing\\n  directly with any device\'s registers. \\n"}]'),
 			route: route,
 			location: location,
 			errors: _user$project$Models$initialErrors,
@@ -12733,20 +12712,6 @@ var _user$project$Main$init = function (location) {
 		location,
 		'fake-addr',
 		_user$project$Routing$router(location));
-	var _p0 = _elm_lang$core$Debug$log(
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'origin=',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				location.origin,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					' host=',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						location.host,
-						A2(_elm_lang$core$Basics_ops['++'], ' pathname=', location.pathname))))));
 	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 };
 var _user$project$Main$main = A2(
