@@ -11,7 +11,7 @@ development story that needs further work.
 
 These design documents will be split into three sections: 
 - (REQ) requirements: this is the libraries we *want* at a high level.
-  This lays out the various layers ([[REQ-layers]]) of abstraction that the
+  This lays out the various layers of abstraction that the
   ecosystem should provide to make programming on microcontrollers safe,
   productive and enjoyable.
 - (SPC) specifications: these will link to a REQ and will lay out a rough
