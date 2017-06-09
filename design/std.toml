@@ -1,0 +1,53 @@
+
+[REQ-std]
+text = '''
+Provide a standard-library like experience for the embedded space. This means
+providing ready data types and functions for:
+- buffering: creating global buffers and sharing them with functions and
+  between threads.
+- serialzing: serializing data with low overhead marshalling and validation of
+  types. 
+- computation: lightweight mathematics libraries
+- data validation: lightweight hash, encryption and crc algorithms
+'''
+
+
+[SPC-std]
+text = '''
+The "standard" library for microcontrollers can NOT be a single crate,
+instead it must be an ecosystem of maintained crates that play well
+together
+'''
+
+
+
+[SPC-std-serializing]
+text = '''
+There shall be extremely lightweight marshalling libraries that utilize
+the `#[derive(...)]` rust syntax. Serde is the recommended choice.
+
+## Existing Crates
+- [`ssmarshal`][0]: stupid simple lightweight marshalling with known
+  serialized size.
+
+## Lacking Features
+While `ssmarshal` does a great job of compactly serializing structs,
+there is no way to validate that the sender/receiver is using the
+right type.
+
+The core missing feature is to be able to derive a `TypeHash`, where
+the type would have a hash associated with it that could be transmitted
+in messages for the purpose of validation. This derivation should
+happen at compile time and require no run-time penalty.
+
+The implementation for such a hashing function should be fairly simple,
+except for the obvious fact that one must understand `derive` syntax
+and how to read the rust AST. Once that knowledge is in hand however,
+one simply needs to create a rolling hash of the struct attrs and types.
+Builtin types (i.e. `u16`, `f32`, arrays, etc) could be hashed simply
+by their name, whereas user defined types (structs and enums) would
+be hashed as the hash of their hashes.
+
+[0]: https://crates.io/crates/ssmarshal
+'''
+

@@ -133,18 +133,6 @@ line) and giving them mappings to access the board's external device's
 libraries. 
 '''
 
-[REQ-std]
-text = '''
-Provide a standard-library like experience for the embedded space. This means
-providing ready data types and functions for:
-- buffering: creating global buffers and sharing them with functions and
-  between threads.
-- serialzing: serializing data with low overhead marshalling and validation of
-  types. 
-- computation: lightweight mathematics libraries
-- data validation: lightweight hash, encryption and crc algorithms
-'''
-
 [REQ-concurrency]
 text = '''
 Provide concurrency primitives and APIs for the embedded space, including
@@ -153,5 +141,5 @@ utilizing interrupts.
 The concurrency API should be leveragable by other libraries (like
 communication) with minimal boiler plate.
 
-TODO: draw ideas from here http://blog.japaric.io/fearless-concurrency/
+Next: see [[SPC-concurrency]]
 '''

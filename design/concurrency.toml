@@ -1,0 +1,37 @@
+
+[REQ-concurrency]
+partof = "REQ-purpose"
+text = '''
+Provide concurrency primitives and APIs for the embedded space, including
+utilizing interrupts.
+
+The concurrency API should be leveragable by other libraries (like
+communication) with minimal boiler plate.
+
+TODO: draw ideas from here http://blog.japaric.io/fearless-concurrency/
+'''
+
+[SPC-concurrency]
+text = '''
+There shall be concurrency libraries which utilize interrupts and
+other low-level features to provide efficient concurrency.
+
+No special API for this is yet defined. However, Rust offers excellent
+concurrency primitives in it's core library (`Send` and `Sync`) which we make
+full use of for embedded development.
+
+## Existing Crates
+- [`cortex-m-rtfm`][0]: interupt-based deadlock-free concurrency model. See
+  it's [introductory post][1]
+- [`tock-os`][2]: a safe, multitasking operating system for low-power,
+  low-memory microcontrollers.
+
+[0]: https://crates.io/crates/cortex-m-rtfm
+[1]: http://blog.japaric.io/fearless-concurrency/
+[2]: https://www.tockos.org/
+
+## Lacking Features
+Existing libraries currently target ARM microprocessors. Support
+for other processors would be beneficial.
+
+'''
