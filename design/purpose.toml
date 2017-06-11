@@ -132,14 +132,3 @@ preventing the user from making horrendous mistakes (i.e. sourcing an I2C
 line) and giving them mappings to access the board's external device's
 libraries. 
 '''
-
-[REQ-concurrency]
-text = '''
-Provide concurrency primitives and APIs for the embedded space, including
-utilizing interrupts.
-
-The concurrency API should be leveragable by other libraries (like
-communication) with minimal boiler plate.
-
-Next: see [[SPC-concurrency]]
-'''
